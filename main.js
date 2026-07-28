@@ -106,5 +106,99 @@ document.querySelectorAll('.card').forEach(card => {
   });
 });
 
+// ── project galleries ────────────────────────────────
+const GALLERIES = {
+  imraa:          { title: 'Imraa',            ext: 'jpeg', count: 4 },
+  debieb_graphic: { title: 'Debieb Graphique', ext: 'webp', count: 4 },
+  lila:           { title: 'Lila',             ext: 'jpeg', count: 2 },
+  cita:           { title: 'Cita',             ext: 'jpeg', count: 3 },
+  para_pharmacy:  { title: 'Parapharmacie',    ext: 'jpeg', count: 4 },
+};
+
+const srcsFor = key => {
+  const g = GALLERIES[key];
+  return Array.from({ length: g.count }, (_, i) => `assets/projects/${key}/${i + 1}.${g.ext}`);
+};
+
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lbImg');
+const lbTitle = document.getElementById('lbTitle');
+const lbCounter = document.getElementById('lbCounter');
+const lbThumbs = document.getElementById('lbThumbs');
+
+let shots = [];
+let index = 0;
+let lastFocus = null;
+
+function show(i) {
+  index = (i + shots.length) % shots.length;
+  lbImg.src = shots[index];
+  lbImg.alt = `${lbTitle.textContent} — screen ${index + 1}`;
+  lbCounter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(shots.length).padStart(2, '0')}`;
+  [...lbThumbs.children].forEach((t, n) => t.classList.toggle('on', n === index));
+  // restart the entry animation
+  lbImg.style.animation = 'none';
+  void lbImg.offsetWidth;
+  lbImg.style.animation = '';
+}
+
+function openGallery(key, startAt = 0) {
+  const g = GALLERIES[key];
+  if (!g) return;
+
+  lastFocus = document.activeElement;
+  shots = srcsFor(key);
+  lbTitle.textContent = g.title;
+
+  lbThumbs.innerHTML = '';
+  shots.forEach((src, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', `Show screen ${i + 1}`);
+    b.innerHTML = `<img src="${src}" alt="" loading="lazy" />`;
+    b.addEventListener('click', () => show(i));
+    lbThumbs.appendChild(b);
+  });
+
+  lb.hidden = false;
+  document.body.classList.add('lb-lock');
+  requestAnimationFrame(() => lb.classList.add('open'));
+  show(startAt);
+  document.getElementById('lbClose').focus();
+}
+
+function closeGallery() {
+  lb.classList.remove('open');
+  document.body.classList.remove('lb-lock');
+  setTimeout(() => { lb.hidden = true; lbImg.src = ''; }, 320);
+  if (lastFocus) lastFocus.focus();
+}
+
+document.querySelectorAll('.card.shot .media').forEach(btn => {
+  btn.addEventListener('click', () => openGallery(btn.closest('.card').dataset.gallery));
+});
+
+document.getElementById('lbClose').addEventListener('click', closeGallery);
+document.getElementById('lbPrev').addEventListener('click', () => show(index - 1));
+document.getElementById('lbNext').addEventListener('click', () => show(index + 1));
+lb.querySelector('[data-close]').addEventListener('click', closeGallery);
+
+document.addEventListener('keydown', e => {
+  if (lb.hidden) return;
+  if (e.key === 'Escape') closeGallery();
+  if (e.key === 'ArrowLeft') show(index - 1);
+  if (e.key === 'ArrowRight') show(index + 1);
+});
+
+// swipe on touch
+let touchX = null;
+lb.addEventListener('touchstart', e => { touchX = e.changedTouches[0].clientX; }, { passive: true });
+lb.addEventListener('touchend', e => {
+  if (touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 55) show(index + (dx < 0 ? 1 : -1));
+  touchX = null;
+}, { passive: true });
+
 // ── misc ─────────────────────────────────────────────
 document.getElementById('year').textContent = new Date().getFullYear();
