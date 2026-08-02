@@ -108,6 +108,7 @@ document.querySelectorAll('.card').forEach(card => {
 
 // ── project galleries ────────────────────────────────
 const GALLERIES = {
+  tawsil:         { title: 'Tawsil',           ext: 'jpeg', count: 7 },
   imraa:          { title: 'Imraa',            ext: 'jpeg', count: 4 },
   debieb_graphic: { title: 'Debieb Graphique', ext: 'webp', count: 4 },
   lila:           { title: 'Lila',             ext: 'jpeg', count: 2 },
