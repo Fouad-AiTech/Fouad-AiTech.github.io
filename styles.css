@@ -321,6 +321,13 @@ html[data-theme="light"] .i-moon { display: none; }
 }
 .card h3 { font-size: 23px; margin-bottom: 12px; }
 .card p { font-size: 15px; color: var(--fg-2); }
+.card-link {
+  position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 6px; margin-top: 18px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .04em;
+  color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent;
+  transition: border-color .2s;
+}
+.card-link:hover, .card-link:focus-visible { border-color: currentColor; }
 .card.research { background: linear-gradient(135deg, color-mix(in srgb, var(--violet) 16%, transparent), transparent 60%); }
 
 /* ── featured project ─────────────────────────────── */
@@ -356,6 +363,9 @@ html[data-theme="light"] .media-blur { opacity: .45; }
   transition: transform .55s var(--e);
 }
 .card.shot:hover .media-img { transform: scale(1.045); }
+.card.web .media { aspect-ratio: 16 / 10; }
+.card.web .media-img { object-fit: cover; object-position: top; padding: 0; }
+.card.web .media-blur { display: none; }
 
 .shot-count {
   position: absolute; z-index: 3; top: 12px; right: 12px;
